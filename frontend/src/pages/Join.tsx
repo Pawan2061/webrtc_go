@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { useFetcher, useLocation } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 export const Join = () => {
   const location = useLocation();
   const userVideo = useRef<HTMLVideoElement | null>(null);
@@ -20,6 +20,8 @@ export const Join = () => {
   useEffect(() => {
     openCamera().then(async () => {
       const roomId = location.pathname.split("/");
+      console.log(roomId, "room id is here 2");
+
       console.log(
         `Connecting to WebSocket with URL: ws://localhost:8000/join?roomId=${roomId[2]}`
       );

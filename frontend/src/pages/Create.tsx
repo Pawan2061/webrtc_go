@@ -5,7 +5,11 @@ export const CreateRoom = () => {
   const create = async (e: any) => {
     e.preventDefault();
     const resp: any = await fetch("http://localhost:8000/create");
-    const { roomId } = resp.json();
+    console.log(resp, "anuedbn");
+
+    const { roomId } = await resp.json();
+    console.log(roomId, "no id");
+
     navigate(`/room/${roomId}`, {
       state: {
         id: roomId,

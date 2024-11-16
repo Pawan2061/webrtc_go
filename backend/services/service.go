@@ -18,7 +18,7 @@ func CreateRoomRequest(w http.ResponseWriter, r *http.Request) {
 	roomId := Allrooms.CreateRoom()
 	fmt.Println("it is here again", roomId)
 	type resp struct {
-		Roomid string `json:"room id"`
+		Roomid string `json:"roomId"`
 	}
 	log.Println(Allrooms.Map)
 	json.NewEncoder(w).Encode(resp{Roomid: roomId})
