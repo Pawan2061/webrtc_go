@@ -21,6 +21,10 @@ type Room struct {
 
 type Message struct {
 	MessageType string `json:"messageType"`
-	Msg         any    `json:"msg"`
-	Err         error  `json:"error"`
+	Msg         Msg    `json:"msg"`
+}
+
+type Msg struct {
+	RoomID string `json:"roomID"`
+	UserID string `json:"userID"`
 }

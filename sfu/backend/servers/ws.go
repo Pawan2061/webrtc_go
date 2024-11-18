@@ -32,6 +32,7 @@ func HandleSocket(c *gin.Context) {
 			log.Println("Error reading the message:", err)
 			return
 		}
+		fmt.Println("received mssg", string(msg))
 		var message structs.Message
 
 		if err := json.Unmarshal(msg, &message); err != nil {
@@ -40,7 +41,8 @@ func HandleSocket(c *gin.Context) {
 		}
 
 		fmt.Println("Message Type:", messageType)
-		response := handleMessage(message)
+		response := handleMessage(message, conn)
+
 		conn.WriteJSON(response)
 		fmt.Println(response)
 
@@ -48,18 +50,28 @@ func HandleSocket(c *gin.Context) {
 
 }
 
-func handleMessage(msg structs.Message) any {
+func handleMessage(msg structs.Message, conn *websocket.Conn) any {
 	var response any
 	switch msg.MessageType {
 	case "createRoom":
-		fmt.Println("inside cases")
-		room := CreateWsroom()
+		room := CreateWsroom(msg.Msg.RoomID, msg.Msg.UserID, conn)
+		fmt.Println("response is there")
 
 		response = room
 
 	case "joinRoom":
 
+		info := JoinRoomws(msg.Msg.RoomID, msg.Msg.UserID, conn)
+		fmt.Println("response is there")
+
+		response = info
+	case "sendMessage":
+
+		info := HandleMessage(msg.Msg.RoomID, msg.Msg.UserID)
+		response = info
+
 	}
+
 	fmt.Println(response)
 	return response
 
