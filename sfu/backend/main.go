@@ -48,7 +48,6 @@ func main() {
 		})
 	})
 
-	// WebSocket route
 	r.GET("/ws", func(ctx *gin.Context) {
 		servers.HandleSocket(ctx)
 	})

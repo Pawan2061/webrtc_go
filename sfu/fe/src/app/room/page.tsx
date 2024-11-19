@@ -9,25 +9,38 @@ import {
   useTracks,
   Chat,
   LayoutContextProvider,
+  ChatToggle,
+  VideoConference,
 } from "@livekit/components-react";
-
 import "@livekit/components-styles";
-
 import { Track } from "livekit-client";
-
+import { useRouter } from "next/navigation";
+import { LocalVideoStreamer } from "@/components/Canvas";
 const serverUrl = "wss://unacademy-ijd7o0e5.livekit.cloud";
 
 export default function Room() {
-  const [token, setToken] = useState<string | null>(null);
+  const router = useRouter();
+  const [token, setToken] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("authToken");
+    const savedToken: any = localStorage.getItem("authToken");
     if (savedToken) {
       setToken(savedToken);
     } else {
       console.error("No token found. Redirecting to signup...");
-      window.location.href = "/signup";
+      router.push("/signup");
     }
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   if (!token) {
@@ -36,31 +49,59 @@ export default function Room() {
 
   return (
     <LayoutContextProvider>
-      <LiveKitRoom
-        video={true}
-        audio={true}
-        token={token}
-        serverUrl={process.env.NEXT_PUBLIC_LK_SERVER_URL || serverUrl}
-        data-lk-theme="default"
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          height: "100vh",
-          overflow: "hidden",
-        }}
-      >
-        <div className="flex-1 flex flex-col ">
-          <div className="flex-1 relative">
-            <MyVideoConference />
-          </div>
-          <RoomAudioRenderer />
-          <ControlBar className="w-full" />
-        </div>
+      <div className="flex flex-col h-screen w-screen">
+        <LiveKitRoom
+          video={true}
+          audio={true}
+          token={token}
+          serverUrl={process.env.NEXT_PUBLIC_LK_SERVER_URL || serverUrl}
+          data-lk-theme="default"
+          className="flex flex-col flex-1"
+        >
+          <div className="flex flex-1 overflow-hidden w-full">
+            <div
+              className={`flex-1 flex flex-col ${
+                isMobile && isChatOpen ? "hidden" : "block"
+              }`}
+            >
+              <div className="flex-1 relative h-[75%]">
+                <VideoConference />
+              </div>
+              <RoomAudioRenderer />
 
-        <div className="w-96 border-l border-gray-200 flex   flex-col">
-          <Chat style={{ flex: 1 }} />{" "}
-        </div>
-      </LiveKitRoom>
+              {/* {videoFile && <LocalVideoStreamer videoFile={videoFile} />}
+              <input
+                type="file"
+                accept="video/*"
+                onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+              /> */}
+            </div>
+
+            {(!isMobile || isChatOpen) && (
+              <div
+                className={`relative h-full border-l border-gray-200 transition-all duration-300 ${
+                  isMobile ? "absolute top-0 left-0 w-full bg-white" : "w-0"
+                }`}
+              >
+                {isMobile && (
+                  <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+                    <h2 className="text-lg font-semibold text-center mx-auto">
+                      Messages
+                    </h2>
+                    <button
+                      onClick={() => setIsChatOpen(false)}
+                      className="p-2 rounded-full"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+                <Chat className="h-full p-4" />
+              </div>
+            )}
+          </div>
+        </LiveKitRoom>
+      </div>
     </LayoutContextProvider>
   );
 }
@@ -73,12 +114,11 @@ function MyVideoConference() {
     ],
     { onlySubscribed: true }
   );
-  console.log(tracks);
 
   return (
     <GridLayout
       tracks={tracks}
-      style={{ height: "calc(100vh - var(--lk-control-bar-height))" }}
+      className="h-[calc(75vh-var(--lk-control-bar-height))] w-full"
     >
       <ParticipantTile />
     </GridLayout>

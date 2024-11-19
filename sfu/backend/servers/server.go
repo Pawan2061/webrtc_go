@@ -2,6 +2,7 @@ package servers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -12,16 +13,29 @@ import (
 )
 
 func GetJoinToken(room, identity string) string {
-	at := auth.NewAccessToken(os.Getenv("LIVEKIT_API_KEY"), os.Getenv("LIVEKIT_API_SECRET"))
+	apikey := os.Getenv("LIVEKIT_API_KEY")
+	fmt.Println(apikey, "its here")
+
+	at := auth.NewAccessToken("APIwyMY4vyhVbx4", "Q3MOMf7cwua3zag5sZIHrfKgnwcc6aGKmeGNWXhD8JuA")
 	grant := &auth.VideoGrant{
 		RoomJoin: true,
 		Room:     room,
 	}
+	fmt.Println("inside the grant")
 	at.AddGrant(grant).
 		SetIdentity(identity).
 		SetValidFor(time.Hour)
 
-	token, _ := at.ToJWT()
+	fmt.Println("working for the grant")
+
+	token, err := at.ToJWT()
+	if err != nil {
+		fmt.Println("Failed to generate the error", err)
+	}
+
+	fmt.Println(token, "token is here")
+	fmt.Println("working for the grant", token)
+
 	return token
 }
 
