@@ -19,9 +19,9 @@ type SignupRequest struct {
 func main() {
 	fmt.Println("working inside main")
 	r := gin.Default()
+
 	r.Use(middlewares.GinEnableCors())
 
-	// Modified to POST request for signup
 	r.POST("/getToken", func(c *gin.Context) {
 		fmt.Println("getting the token")
 		var req SignupRequest

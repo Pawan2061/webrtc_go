@@ -7,6 +7,8 @@ import {
   ParticipantTile,
   RoomAudioRenderer,
   useTracks,
+  Chat,
+  LayoutContextProvider,
 } from "@livekit/components-react";
 
 import "@livekit/components-styles";
@@ -19,35 +21,47 @@ export default function Room() {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch the token from localStorage
     const savedToken = localStorage.getItem("authToken");
     if (savedToken) {
       setToken(savedToken);
     } else {
       console.error("No token found. Redirecting to signup...");
-      // Redirect to the signup page if no token exists
       window.location.href = "/signup";
     }
   }, []);
 
-  // Render nothing until the token is available
   if (!token) {
     return <p>Loading...</p>;
   }
 
   return (
-    <LiveKitRoom
-      video={true}
-      audio={true}
-      token={token}
-      serverUrl={process.env.NEXT_PUBLIC_LK_SERVER_URL || serverUrl}
-      data-lk-theme="default"
-      style={{ height: "100vh" }}
-    >
-      <MyVideoConference />
-      <RoomAudioRenderer />
-      <ControlBar />
-    </LiveKitRoom>
+    <LayoutContextProvider>
+      <LiveKitRoom
+        video={true}
+        audio={true}
+        token={token}
+        serverUrl={process.env.NEXT_PUBLIC_LK_SERVER_URL || serverUrl}
+        data-lk-theme="default"
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          height: "100vh",
+          overflow: "hidden",
+        }}
+      >
+        <div className="flex-1 flex flex-col ">
+          <div className="flex-1 relative">
+            <MyVideoConference />
+          </div>
+          <RoomAudioRenderer />
+          <ControlBar className="w-full" />
+        </div>
+
+        <div className="w-96 border-l border-gray-200 flex   flex-col">
+          <Chat style={{ flex: 1 }} />{" "}
+        </div>
+      </LiveKitRoom>
+    </LayoutContextProvider>
   );
 }
 
