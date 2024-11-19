@@ -15,7 +15,6 @@ import {
 import "@livekit/components-styles";
 import { Track } from "livekit-client";
 import { useRouter } from "next/navigation";
-import { LocalVideoStreamer } from "@/components/Canvas";
 const serverUrl = "wss://unacademy-ijd7o0e5.livekit.cloud";
 
 export default function Room() {
@@ -24,6 +23,7 @@ export default function Room() {
   const [isMobile, setIsMobile] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
 
   useEffect(() => {
     const savedToken: any = localStorage.getItem("authToken");
@@ -42,6 +42,27 @@ export default function Room() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+  const startRecording = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/record", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setIsRecording(true);
+        alert("Recording started successfully");
+      } else {
+        alert("Failed to start recording");
+      }
+    } catch (err) {
+      console.error("Error starting recording:", err);
+      alert("Error starting recording");
+    }
+  };
 
   if (!token) {
     return <p>Loading...</p>;
@@ -68,13 +89,6 @@ export default function Room() {
                 <VideoConference />
               </div>
               <RoomAudioRenderer />
-
-              {/* {videoFile && <LocalVideoStreamer videoFile={videoFile} />}
-              <input
-                type="file"
-                accept="video/*"
-                onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
-              /> */}
             </div>
 
             {(!isMobile || isChatOpen) && (
@@ -99,6 +113,14 @@ export default function Room() {
                 <Chat className="h-full p-4" />
               </div>
             )}
+            <div className="absolute bottom-4 left-4 z-10">
+              <button
+                onClick={startRecording}
+                className="bg-blue-500 text-white p-2 rounded-full"
+              >
+                {isRecording ? "Recording..." : "Start Recording"}
+              </button>
+            </div>
           </div>
         </LiveKitRoom>
       </div>
