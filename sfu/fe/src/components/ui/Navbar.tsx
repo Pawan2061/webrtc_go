@@ -19,7 +19,7 @@ export default function Navbar() {
             Button
           </button>
 
-          <button className="bg-transparent  text-white py-2 px-4 border bg-[#3C4852] border-slate-300  hover:bg-[#546470]    rounded">
+          <button className="bg-transparent  hover:text-white py-2 px-4 border bg-[#3C4852] border-slate-300  hover:bg-[#546470]    rounded">
             Join for free
           </button>
         </div>

@@ -1,4 +1,5 @@
 import Herocards from "./ui/HeroCards";
+import { IntroCard } from "./ui/IntroCard";
 import PhoneInput from "./ui/Phoneinput";
 import Search from "./ui/search";
 
@@ -8,7 +9,7 @@ export default function Landing() {
       <section className="flex py-20  gap-2">
         <div className="flex flex-col flex-1 gap-6">
           <h1 className="text-[#3C4852] font-semibold text-5xl w-full">
-            Crack your goal with India’s top educators
+            Crack your goal with Indias top educators
           </h1>
           <h1 className="text-xl font-medium w-full py-2">
             Over <span className="text-green-600">10 crore</span> learners trust
@@ -29,6 +30,7 @@ export default function Landing() {
         </h1>
         <Search />
         <Herocards />
+        <IntroCard />
       </div>
     </div>
   );
