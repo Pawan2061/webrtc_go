@@ -64,6 +64,9 @@ export default function Room() {
     }
   };
 
+  const startWhiteboard = async () => {
+    router.push("/board");
+  };
   if (!token) {
     return <p>Loading...</p>;
   }
@@ -119,6 +122,13 @@ export default function Room() {
                 className="bg-blue-500 text-white p-2 rounded-full"
               >
                 {isRecording ? "Recording..." : "Start Recording"}
+              </button>
+
+              <button
+                onClick={startWhiteboard}
+                className="bg-blue-500 text-white p-2 rounded-full"
+              >
+                {isRecording ? "WhiteBoard..." : "Start Board"}
               </button>
             </div>
           </div>

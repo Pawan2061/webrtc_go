@@ -1,3 +1,9 @@
-export default function Home() {
-  return <div>hi</div>;
+import Landing from "@/components/Landing";
+
+export default function App() {
+  return (
+    <div>
+      <Landing />
+    </div>
+  );
 }
