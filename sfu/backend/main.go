@@ -101,7 +101,7 @@ func main() {
 		servers.HandleSocket(ctx)
 	})
 	r.POST("/upload", servers.HandlePdfUpload)
-	r.GET("/pdf/:file")
+	r.GET("/uploads/:file", servers.GetPdf)
 
 	log.Println("Server starting on :8080")
 	if err := r.Run(":8080"); err != nil {

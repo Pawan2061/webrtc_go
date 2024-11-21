@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/livekit/protocol/auth"
 	livekit "github.com/livekit/protocol/livekit"
 	lksdk "github.com/livekit/server-sdk-go"
@@ -80,6 +81,9 @@ func HandlePdfUpload(c *gin.Context) {
 		return
 	}
 
+	// Generate a unique filename to avoid path traversal and filename conflicts
+	uniqueFilename := uuid.New().String() + filepath.Ext(file.Filename)
+
 	uploadDir := "./uploads"
 	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
 		if mkdirErr := os.Mkdir(uploadDir, 0755); mkdirErr != nil {
@@ -87,23 +91,45 @@ func HandlePdfUpload(c *gin.Context) {
 			return
 		}
 	}
-	filePath := filepath.Join(uploadDir, file.Filename)
+
+	filePath := filepath.Join(uploadDir, uniqueFilename)
+
 	if err := c.SaveUploadedFile(file, filePath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
 		return
 	}
 
 	pages, err := middlewares.GetPDFPageCount(filePath)
-	fmt.Println(pages)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read PDF metadata"})
 		return
 	}
 
 	response := UploadResponse{
-		Filename:     file.Filename,
+		Filename:     uniqueFilename, // Use the unique filename
 		OriginalName: file.Filename,
 		TotalPages:   pages,
 	}
 	c.JSON(http.StatusOK, response)
+}
+
+func GetPdf(c *gin.Context) {
+	doc := c.Param("file")
+	uploadsDir := "./uploads"
+
+	fmt.Println(doc)
+	fmt.Println("serving the directory")
+	filePath := filepath.Join(uploadsDir, filepath.Clean(doc))
+
+	fmt.Printf("Requested document: %s\n", doc)
+	fmt.Printf("Resolved file path: %s\n", filePath)
+
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		fmt.Println(filePath)
+		c.JSON(http.StatusNotFound, gin.H{"error": "File not found"})
+		return
+	}
+
+	c.Writer.Header().Set("Content-Type", "application/pdf")
+	c.File(filePath)
 }

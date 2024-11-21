@@ -24,6 +24,7 @@ const WebSocketPDFViewer: React.FC<WebSocketPDFViewerProps> = ({ pdfFile }) => {
   };
 
   const fullPdfUrl = `http://localhost:8080/uploads/${pdfFile}`;
+  console.log(fullPdfUrl, "pdf here");
 
   return (
     <div className="pdf-viewer container mx-auto">
