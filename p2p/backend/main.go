@@ -30,7 +30,7 @@ func (s *Session) handleConn(w http.ResponseWriter, r *http.Request) {
 	for {
 		var msg map[string]interface{}
 
-		err := ws.ReadJSON(&msg) // Read the message from the WebSocket
+		err := ws.ReadJSON(&msg)
 		if err != nil {
 			fmt.Println("Error reading message:", err)
 			return

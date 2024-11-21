@@ -6,8 +6,8 @@ import PDFSlideshare from "@/components/ui/Slideshare";
 export default function App() {
   return (
     <div>
-      {/* <Landing /> */}
-      <PDFSlideshare />
+      <Landing />
+      {/* <PDFSlideshare /> */}
     </div>
   );
 }

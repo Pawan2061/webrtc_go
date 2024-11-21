@@ -49,8 +49,8 @@ export const LocalVideoStreamer = ({ videoFile }: { videoFile: File }) => {
       }
       URL.revokeObjectURL(fileURL);
       videoElement.src = "";
-      setIsPlaying(false); // Reset playing state
-      previousVideoFileRef.current = videoFile; // Update the ref to the new video file
+      setIsPlaying(false);
+      previousVideoFileRef.current = videoFile;
     };
   }, [localParticipant, videoFile]);
 
