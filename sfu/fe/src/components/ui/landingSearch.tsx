@@ -1,3 +1,3 @@
 export default function LandingSearch() {
-  return <div>hi</div>;
+  return <section className=""></section>;
 }

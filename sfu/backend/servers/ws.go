@@ -70,6 +70,8 @@ func handleMessage(msg structs.Message, conn *websocket.Conn) any {
 		info := HandleMessage(msg.Msg.RoomID, msg.Msg.UserID)
 		response = info
 
+	case "page_update":
+
 	}
 
 	fmt.Println(response)

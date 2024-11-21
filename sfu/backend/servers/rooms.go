@@ -16,8 +16,7 @@ var mu sync.Mutex
 
 func AddParticipant(name string, conn *websocket.Conn) *structs.Participant {
 	fmt.Println("inside bro")
-	// mu.Lock()
-	// defer mu.Unlock()
+
 	fmt.Println("1dnbdejdneidw")
 
 	participant := &structs.Participant{

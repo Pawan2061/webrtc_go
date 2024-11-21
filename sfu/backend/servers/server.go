@@ -1,16 +1,26 @@
 package servers
 
 import (
+	"backend/middlewares"
 	"context"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/livekit/protocol/auth"
 	livekit "github.com/livekit/protocol/livekit"
 	lksdk "github.com/livekit/server-sdk-go"
 )
+
+type UploadResponse struct {
+	Filename     string `json:"filename"`
+	OriginalName string `json:"originalName"`
+	TotalPages   int    `json:"totalPages"`
+}
 
 func GetJoinToken(room, identity string) string {
 	apikey := os.Getenv("LIVEKIT_API_KEY")
@@ -62,4 +72,38 @@ func CreateRoom() *livekit.Room {
 
 	log.Printf("Room created: %s", room.Name)
 	return room
+}
+func HandlePdfUpload(c *gin.Context) {
+	file, err := c.FormFile("pdf")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to get file from form"})
+		return
+	}
+
+	uploadDir := "./uploads"
+	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
+		if mkdirErr := os.Mkdir(uploadDir, 0755); mkdirErr != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create upload directory"})
+			return
+		}
+	}
+	filePath := filepath.Join(uploadDir, file.Filename)
+	if err := c.SaveUploadedFile(file, filePath); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
+		return
+	}
+
+	pages, err := middlewares.GetPDFPageCount(filePath)
+	fmt.Println(pages)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read PDF metadata"})
+		return
+	}
+
+	response := UploadResponse{
+		Filename:     file.Filename,
+		OriginalName: file.Filename,
+		TotalPages:   pages,
+	}
+	c.JSON(http.StatusOK, response)
 }

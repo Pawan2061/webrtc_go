@@ -12,7 +12,6 @@ type Participant struct {
 	JoinedAt   time.Time
 }
 
-// Room represents a chat room
 type Room struct {
 	ID           string
 	Participants []*Participant

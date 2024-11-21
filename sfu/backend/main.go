@@ -57,6 +57,7 @@ func main() {
 	})
 
 	r.POST("/record", func(c *gin.Context) {
+
 		var req StartRecordingRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
@@ -96,8 +97,11 @@ func main() {
 	})
 
 	r.GET("/ws", func(ctx *gin.Context) {
+		fmt.Println("handling websockets")
 		servers.HandleSocket(ctx)
 	})
+	r.POST("/upload", servers.HandlePdfUpload)
+	r.GET("/pdf/:file")
 
 	log.Println("Server starting on :8080")
 	if err := r.Run(":8080"); err != nil {
