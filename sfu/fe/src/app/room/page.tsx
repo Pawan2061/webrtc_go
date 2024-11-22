@@ -1,20 +1,28 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import {
-  ControlBar,
-  GridLayout,
   LiveKitRoom,
-  ParticipantTile,
   RoomAudioRenderer,
-  useTracks,
   Chat,
   LayoutContextProvider,
-  ChatToggle,
   VideoConference,
+  useLiveKitRoom,
+  useRoomInfo,
+  useLocalParticipant,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Track } from "livekit-client";
 import { useRouter } from "next/navigation";
+import { randomUUID } from "crypto";
+import Board from "../board/page";
+
+const ExcalidrawWrapper = dynamic(
+  async () => (await import("../board/wrapper")).default,
+  {
+    ssr: false,
+  }
+);
+
 const serverUrl = "wss://unacademy-ijd7o0e5.livekit.cloud";
 
 export default function Room() {
@@ -22,11 +30,12 @@ export default function Room() {
   const [token, setToken] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [showWhiteboard, setShowWhiteboard] = useState(false);
 
   useEffect(() => {
     const savedToken: any = localStorage.getItem("authToken");
+
     if (savedToken) {
       setToken(savedToken);
     } else {
@@ -42,6 +51,7 @@ export default function Room() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
   const startRecording = async () => {
     try {
       const response = await fetch("http://localhost:8080/record", {
@@ -64,9 +74,10 @@ export default function Room() {
     }
   };
 
-  const startWhiteboard = async () => {
-    router.push("/board");
+  const toggleWhiteboard = () => {
+    setShowWhiteboard(!showWhiteboard);
   };
+
   if (!token) {
     return <p>Loading...</p>;
   }
@@ -88,16 +99,30 @@ export default function Room() {
                 isMobile && isChatOpen ? "hidden" : "block"
               }`}
             >
-              <div className="flex-1 relative h-[75%]">
-                <VideoConference />
+              <div className="flex flex-1 h-[75vh]">
+                <div className="flex-1 relative border-r border-gray-200">
+                  <VideoConference />
+                </div>
+
+                <div className="flex-1 relative  ">
+                  {showWhiteboard && <Board key="pawan" />}
+                  <div className="absolute bottom-4 left-44 z-10 flex gap-2">
+                    <button
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors"
+                      onClick={toggleWhiteboard}
+                    >
+                      Stop board
+                    </button>
+                  </div>
+                </div>
               </div>
               <RoomAudioRenderer />
             </div>
 
-            {(!isMobile || isChatOpen) && (
+            {isChatOpen && (
               <div
                 className={`relative h-full border-l border-gray-200 transition-all duration-300 ${
-                  isMobile ? "absolute top-0 left-0 w-full bg-white" : "w-0"
+                  isMobile ? "fixed top-0 right-0 w-full bg-white z-50" : "w-80"
                 }`}
               >
                 {isMobile && (
@@ -116,43 +141,17 @@ export default function Room() {
                 <Chat className="h-full p-4" />
               </div>
             )}
-            <div className="absolute bottom-4 left-4 z-10">
+            <div className="absolute bottom-4 left-4 z-10 flex gap-2">
               <button
                 onClick={startRecording}
-                className="bg-blue-500 text-white p-2 rounded-full"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors"
               >
                 {isRecording ? "Recording..." : "Start Recording"}
-              </button>
-
-              <button
-                onClick={startWhiteboard}
-                className="bg-blue-500 text-white p-2 rounded-full"
-              >
-                {isRecording ? "WhiteBoard..." : "Start Board"}
               </button>
             </div>
           </div>
         </LiveKitRoom>
       </div>
     </LayoutContextProvider>
-  );
-}
-
-function MyVideoConference() {
-  const tracks = useTracks(
-    [
-      { source: Track.Source.Camera, withPlaceholder: true },
-      { source: Track.Source.ScreenShare, withPlaceholder: false },
-    ],
-    { onlySubscribed: true }
-  );
-
-  return (
-    <GridLayout
-      tracks={tracks}
-      className="h-[calc(75vh-var(--lk-control-bar-height))] w-full"
-    >
-      <ParticipantTile />
-    </GridLayout>
   );
 }

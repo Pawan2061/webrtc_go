@@ -36,7 +36,7 @@ const SignupPage = () => {
       console.log(data);
 
       localStorage.setItem("authToken", data.token);
-      router.push("/room");
+      router.push(`/room`);
 
       console.log("Signup successful");
     } catch (err) {

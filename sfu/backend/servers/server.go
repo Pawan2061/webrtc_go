@@ -28,9 +28,16 @@ func GetJoinToken(room, identity string) string {
 	fmt.Println(apikey, "its here")
 
 	at := auth.NewAccessToken("APIwyMY4vyhVbx4", "Q3MOMf7cwua3zag5sZIHrfKgnwcc6aGKmeGNWXhD8JuA")
+	canSubscribe := true
+	canPublish := true
+	canPublishData := true
+
 	grant := &auth.VideoGrant{
-		RoomJoin: true,
-		Room:     room,
+		RoomJoin:       true,
+		Room:           room,
+		CanSubscribe:   &canSubscribe,
+		CanPublish:     &canPublish,
+		CanPublishData: &canPublishData,
 	}
 	fmt.Println("inside the grant")
 	at.AddGrant(grant).
