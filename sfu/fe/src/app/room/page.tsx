@@ -15,28 +15,23 @@ import "@livekit/components-styles";
 import { useRouter } from "next/navigation";
 import { randomUUID } from "crypto";
 import Board from "../board/page";
-
-const ExcalidrawWrapper = dynamic(
-  async () => (await import("../board/wrapper")).default,
-  {
-    ssr: false,
-  }
-);
-
+import { livekitShare } from "@/store/store";
+import { useRecoilState } from "recoil";
 const serverUrl = "wss://unacademy-ijd7o0e5.livekit.cloud";
-
 export default function Room() {
   const router = useRouter();
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [livekit, setLiveKit] = useRecoilState(livekitShare);
   const [isMobile, setIsMobile] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [showWhiteboard, setShowWhiteboard] = useState(false);
-
   useEffect(() => {
-    const savedToken: any = localStorage.getItem("authToken");
+    const savedToken = localStorage.getItem("authToken");
 
     if (savedToken) {
+      setLiveKit((prev) => ({ ...prev, token: savedToken }));
+
       setToken(savedToken);
     } else {
       console.error("No token found. Redirecting to signup...");
@@ -104,7 +99,7 @@ export default function Room() {
                   <VideoConference />
                 </div>
 
-                <div className="flex-1 relative  ">
+                {/* <div className="flex-1 relative  ">
                   {showWhiteboard && <Board key="pawan" />}
                   <div className="absolute bottom-4 left-44 z-10 flex gap-2">
                     <button
@@ -114,7 +109,7 @@ export default function Room() {
                       Stop board
                     </button>
                   </div>
-                </div>
+                </div> */}
               </div>
               <RoomAudioRenderer />
             </div>
