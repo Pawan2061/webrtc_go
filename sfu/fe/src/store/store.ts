@@ -1,6 +1,10 @@
 "use client";
 import { atom } from "recoil";
 
+export const value = atom({
+  key: "atom",
+  default: 0,
+});
 export const livekitShare = atom({
   key: "livekitshare",
   default: {

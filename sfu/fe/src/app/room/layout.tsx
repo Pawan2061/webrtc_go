@@ -5,6 +5,7 @@ export default function Layout({ children }: any) {
   return (
     <>
       <MeetNav />
+
       <main>{children}</main>
     </>
   );

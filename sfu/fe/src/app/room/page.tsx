@@ -7,31 +7,28 @@ import {
   Chat,
   LayoutContextProvider,
   VideoConference,
-  useLiveKitRoom,
-  useRoomInfo,
-  useLocalParticipant,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { useRouter } from "next/navigation";
-import { randomUUID } from "crypto";
-import Board from "../board/page";
-import { livekitShare } from "@/store/store";
-import { useRecoilState } from "recoil";
+import { livekitShare, value } from "@/store/store";
+import { useRecoilState, useRecoilValue } from "recoil";
 const serverUrl = "wss://unacademy-ijd7o0e5.livekit.cloud";
 export default function Room() {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
-  const [livekit, setLiveKit] = useRecoilState(livekitShare);
   const [isMobile, setIsMobile] = useState(false);
+  const [livekit, setLivekit] = useRecoilState(livekitShare);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [showWhiteboard, setShowWhiteboard] = useState(false);
+
+  console.log(value);
+
   useEffect(() => {
     const savedToken = localStorage.getItem("authToken");
+    console.log(livekit.token, "livekit ehre");
 
     if (savedToken) {
-      setLiveKit((prev) => ({ ...prev, token: savedToken }));
-
       setToken(savedToken);
     } else {
       console.error("No token found. Redirecting to signup...");
@@ -43,7 +40,7 @@ export default function Room() {
     };
 
     handleResize();
-    window.addEventListener("resize", handleResize);
+    // window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
