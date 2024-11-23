@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
 import {
   LiveKitRoom,
   RoomAudioRenderer,
@@ -11,23 +10,23 @@ import {
 import "@livekit/components-styles";
 import { useRouter } from "next/navigation";
 import { livekitShare, value } from "@/store/store";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState } from "recoil";
+import Board from "../board/page";
+import PDFSlideshare from "@/components/ui/Slideshare";
+
 const serverUrl = "wss://unacademy-ijd7o0e5.livekit.cloud";
+
 export default function Room() {
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [livekit, setLivekit] = useRecoilState(livekitShare);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [showWhiteboard, setShowWhiteboard] = useState(false);
-
-  console.log(value);
+  const [showSlides, setShowSlides] = useState(false);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("authToken");
-    console.log(livekit.token, "livekit ehre");
-
     if (savedToken) {
       setToken(savedToken);
     } else {
@@ -40,34 +39,18 @@ export default function Room() {
     };
 
     handleResize();
-    // window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const startRecording = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/record", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({}),
-      });
-      const data = await response.json();
-      if (data.success) {
-        setIsRecording(true);
-        alert("Recording started successfully");
-      } else {
-        alert("Failed to start recording");
-      }
-    } catch (err) {
-      console.error("Error starting recording:", err);
-      alert("Error starting recording");
-    }
-  };
-
   const toggleWhiteboard = () => {
     setShowWhiteboard(!showWhiteboard);
+    if (showSlides) setShowSlides(false); // Ensure only one is shown at a time
+  };
+
+  const toggleSlides = () => {
+    setShowSlides(!showSlides);
+    if (showWhiteboard) setShowWhiteboard(false); // Ensure only one is shown at a time
   };
 
   if (!token) {
@@ -93,21 +76,16 @@ export default function Room() {
             >
               <div className="flex flex-1 h-[75vh]">
                 <div className="flex-1 relative border-r border-gray-200">
-                  <VideoConference />
+                  {showWhiteboard ? (
+                    <Board />
+                  ) : showSlides ? (
+                    <PDFSlideshare />
+                  ) : (
+                    <VideoConference />
+                  )}
                 </div>
-
-                {/* <div className="flex-1 relative  ">
-                  {showWhiteboard && <Board key="pawan" />}
-                  <div className="absolute bottom-4 left-44 z-10 flex gap-2">
-                    <button
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors"
-                      onClick={toggleWhiteboard}
-                    >
-                      Stop board
-                    </button>
-                  </div>
-                </div> */}
               </div>
+
               <RoomAudioRenderer />
             </div>
 
@@ -133,12 +111,19 @@ export default function Room() {
                 <Chat className="h-full p-4" />
               </div>
             )}
+
             <div className="absolute bottom-4 left-4 z-10 flex gap-2">
               <button
-                onClick={startRecording}
+                onClick={toggleWhiteboard}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full transition-colors"
               >
-                {isRecording ? "Recording..." : "Start Recording"}
+                {showWhiteboard ? "Show Video" : "Show Whiteboard"}
+              </button>
+              <button
+                onClick={toggleSlides}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full transition-colors"
+              >
+                {showSlides ? "Show Video" : "Show Slides"}
               </button>
             </div>
           </div>

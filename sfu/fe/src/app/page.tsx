@@ -7,9 +7,9 @@ import PDFSlideshare from "@/components/ui/Slideshare";
 export default function App() {
   return (
     <div>
-      <Navbar />
-      <Landing />
-      {/* <PDFSlideshare /> */}
+      {/* <Navbar />
+      <Landing /> */}
+      <PDFSlideshare />
     </div>
   );
 }
