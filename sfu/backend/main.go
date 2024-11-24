@@ -153,7 +153,7 @@ func main() {
 		})
 	})
 
-	r.POST("/record", func(c *gin.Context) {
+	r.POST("/api/record", func(c *gin.Context) {
 
 		var req StartRecordingRequest
 		if err := c.ShouldBindJSON(&req); err != nil {

@@ -21,7 +21,6 @@ const testBook: Book = {
   description: "A classic book",
 };
 
-// Type for select options
 interface SelectOption {
   value: string;
   label: string;
@@ -30,7 +29,6 @@ interface SelectOption {
 const Search: NextPage = () => {
   const [mounted, setMounted] = useState(false);
 
-  // Mount handling
   React.useEffect(() => {
     setMounted(true);
   }, []);

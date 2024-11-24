@@ -6,12 +6,14 @@ import {
   Chat,
   LayoutContextProvider,
   VideoConference,
+  useRoomInfo,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { useRouter } from "next/navigation";
 import { livekitShare, value } from "@/store/store";
 import { useRecoilState } from "recoil";
 import Board from "../board/page";
+
 import PDFSlideshare from "@/components/ui/Slideshare";
 
 const serverUrl = "wss://unacademy-ijd7o0e5.livekit.cloud";
@@ -45,17 +47,42 @@ export default function Room() {
 
   const toggleWhiteboard = () => {
     setShowWhiteboard(!showWhiteboard);
-    if (showSlides) setShowSlides(false); // Ensure only one is shown at a time
+    if (showSlides) setShowSlides(false);
   };
 
   const toggleSlides = () => {
     setShowSlides(!showSlides);
-    if (showWhiteboard) setShowWhiteboard(false); // Ensure only one is shown at a time
+    if (showWhiteboard) setShowWhiteboard(false);
   };
 
   if (!token) {
     return <p>Loading...</p>;
   }
+  const handleRecording = async () => {
+    try {
+      const response = await fetch("/api/record", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomName: "pawanroom",
+          filepath: "recording.mp4",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to start recording");
+      }
+
+      const data = await response.json();
+      setIsRecording(true);
+      console.log("Recording started:", data);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to start recording");
+    }
+  };
 
   return (
     <LayoutContextProvider>
@@ -124,6 +151,14 @@ export default function Room() {
                 className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full transition-colors"
               >
                 {showSlides ? "Show Video" : "Show Slides"}
+              </button>
+              <button
+                onClick={handleRecording}
+                className={`${
+                  isRecording ? "bg-red-500" : "bg-green-500"
+                } hover:bg-green-600 text-white px-4 py-2 rounded-full transition-colors`}
+              >
+                {isRecording ? "Recording..." : "Start recording"}
               </button>
             </div>
           </div>

@@ -88,7 +88,6 @@ func HandlePdfUpload(c *gin.Context) {
 		return
 	}
 
-	// Generate a unique filename to avoid path traversal and filename conflicts
 	uniqueFilename := uuid.New().String() + filepath.Ext(file.Filename)
 
 	uploadDir := "./uploads"
@@ -113,7 +112,7 @@ func HandlePdfUpload(c *gin.Context) {
 	}
 
 	response := UploadResponse{
-		Filename:     uniqueFilename, // Use the unique filename
+		Filename:     uniqueFilename,
 		OriginalName: file.Filename,
 		TotalPages:   pages,
 	}

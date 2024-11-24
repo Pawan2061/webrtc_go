@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { PDFUploader } from "./PdfUploader";
 import WebSocketPDFViewer from "../Pdf";
+import { root } from "postcss";
 
 const PDFSlideshare = () => {
   const [pdfFile, setPdfFile] = useState<string | null>(null);
