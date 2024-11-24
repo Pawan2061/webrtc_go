@@ -17,11 +17,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type SignupRequest struct {
+type Roomsignup struct {
 	Username string `json:"username"`
 	Room     string `json:"room"`
 	Password string `json:"password"`
 }
+
 type StartRecordingRequest struct {
 	RoomName string `json:"room_name"`
 	FilePath string `json:"file_path"`
@@ -36,7 +37,7 @@ func main() {
 
 	r.Use(middlewares.GinEnableCors())
 
-	r.POST("/signup", func(c *gin.Context) {
+	r.POST("/auth/signup", func(c *gin.Context) {
 		fmt.Println("Inside the signup")
 
 		var user structs.User
@@ -77,6 +78,7 @@ func main() {
 			})
 			return
 		}
+		fmt.Println("user is created")
 
 		user.Password = ""
 
@@ -129,7 +131,7 @@ func main() {
 
 	r.POST("/getToken", func(c *gin.Context) {
 		fmt.Println("getting the token")
-		var req SignupRequest
+		var req Roomsignup
 
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})

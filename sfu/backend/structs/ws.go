@@ -29,8 +29,10 @@ type Msg struct {
 }
 
 type User struct {
-	Id       uint   `json:"Id" gorm:"primaryKey`
+	Id uint `json:"Id" gorm:"primaryKey"`
+
 	Username string `json:"username"`
+	Email    string `json:"email"`
 	Password string `json:"-"`
 }
 

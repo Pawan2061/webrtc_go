@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { RecoilRoot } from "recoil";
 import Navbar from "@/components/ui/Navbar";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import RecoilContextProvider from "@/components/Recoilprovider";
 
 const geistSans = localFont({
@@ -27,12 +28,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const queryClient = new QueryClient();
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <RecoilContextProvider>{children}</RecoilContextProvider>
+        <RecoilContextProvider>
+          <QueryClientProvider client={queryClient}>
+            {" "}
+            {children}
+          </QueryClientProvider>
+        </RecoilContextProvider>
       </body>
     </html>
   );
