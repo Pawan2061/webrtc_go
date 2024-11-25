@@ -49,7 +49,7 @@ const SignupPage = () => {
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Sign Up</CardTitle>
+          <CardTitle>Enter the room</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignup} className="space-y-4">
@@ -89,7 +89,7 @@ const SignupPage = () => {
               </Alert>
             )}
             <Button type="submit" className="w-full">
-              Sign Up
+              Enter the room
             </Button>
           </form>
         </CardContent>

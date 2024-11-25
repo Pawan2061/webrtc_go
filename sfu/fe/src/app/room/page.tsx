@@ -60,27 +60,30 @@ export default function Room() {
   }
   const handleRecording = async () => {
     try {
-      const response = await fetch("/api/record", {
+      const response = await fetch("http://localhost:8080/record", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          roomName: "pawanroom",
-          filepath: "recording.mp4",
+          room_name: "pawanroom",
+          file_path: "/tmp/test.mp4",
+          layout: "speaker",
         }),
       });
 
+      console.log(response);
+
       if (!response.ok) {
+        console.log(response);
+
         throw new Error("Failed to start recording");
       }
 
       const data = await response.json();
-      setIsRecording(true);
       console.log("Recording started:", data);
     } catch (error) {
-      console.error(error);
-      alert("Failed to start recording");
+      console.error("Error:", error);
     }
   };
 

@@ -87,8 +87,9 @@ func main() {
 		})
 	})
 
-	r.POST("/login", func(c *gin.Context) {
+	r.POST("/auth/login", func(c *gin.Context) {
 		var user structs.User
+		fmt.Println("reached here")
 		if err := c.ShouldBindJSON(&user); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"message": "bad request",
@@ -96,15 +97,18 @@ func main() {
 			})
 			return
 		}
+		fmt.Println("workings")
 
 		var userFound structs.User
 		result := database.Db.Where("username = ?", user.Username).First(&userFound)
 		if result.Error != nil {
+			fmt.Println(result.Error)
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "invalid credentials",
 			})
 			return
 		}
+		fmt.Println("checked here")
 
 		err := bcrypt.CompareHashAndPassword([]byte(userFound.Password), []byte(user.Password))
 		if err != nil {
@@ -123,6 +127,7 @@ func main() {
 			return
 		}
 
+		fmt.Println("generatign the token", token)
 		c.JSON(http.StatusOK, gin.H{
 			"message": "login successful",
 			"token":   token,
@@ -155,44 +160,43 @@ func main() {
 		})
 	})
 
-	r.POST("/api/record", func(c *gin.Context) {
-
+	r.POST("/record", func(c *gin.Context) {
 		var req StartRecordingRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
+			log.Printf("Error binding JSON: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+			return
 		}
-		ctx := context.Background()
+		log.Printf("Received request: %+v", req)
 
+		ctx := context.Background()
 		egressClient := lksdk.NewEgressClient(
-			"https://my-livekit-host",
-			"livekit-api-key",
-			"livekit-api-secret",
+			"wss://unacademy-ijd7o0e5.livekit.cloud",
+			"APIwyMY4vyhVbx4",
+			"Q3MOMf7cwua3zag5sZIHrfKgnwcc6aGKmeGNWXhD8JuA",
 		)
+
 		fileRequest := &livekit.RoomCompositeEgressRequest{
-			RoomName: "MY-ROOM",
-			Layout:   "speaker",
+			RoomName: req.RoomName,
+			Layout:   req.Layout,
 			Output: &livekit.RoomCompositeEgressRequest_File{
 				File: &livekit.EncodedFileOutput{
 					FileType: livekit.EncodedFileType_MP4,
-					Filepath: "",
+					Filepath: "public/my-room-test.mp4",
 				},
 			},
 		}
+		log.Printf("Egress Request: %+v", fileRequest)
 
 		info, err := egressClient.StartRoomCompositeEgress(ctx, fileRequest)
 		if err != nil {
 			log.Printf("Failed to start egress: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to start recording"})
 			return
-
 		}
 
-		egressId := info.EgressId
-		c.JSON(http.StatusOK, gin.H{
-			"message":   "Recording started",
-			"egress_id": egressId,
-		})
-
+		log.Printf("Egress started successfully: %+v", info)
+		c.JSON(http.StatusOK, gin.H{"message": "Recording started", "info": info})
 	})
 
 	r.GET("/ws", func(ctx *gin.Context) {

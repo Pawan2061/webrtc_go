@@ -24,7 +24,14 @@ interface AuthResponse {
 
 const api = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const { data } = await axios.post("/auth/login", credentials);
+    console.log(credentials, "creds are here");
+
+    const { data } = await axios.post(
+      "http://localhost:8080/auth/login",
+      credentials
+    );
+    console.log(data);
+
     return data;
   },
 
@@ -114,8 +121,6 @@ const AuthModal = ({ isOpen, onClose }: any) => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("reached here");
-
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
